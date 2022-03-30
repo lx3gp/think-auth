@@ -1,0 +1,42 @@
+{
+    "name": "lx3gp/think-auth",
+    "description": "this package for thinkPHP6",
+    "keywords": [
+        "vendor",
+        "thinkPHP6",
+        "auth"
+    ],
+    "homepage": "https://github.com/lx3gp/think-auth",
+    "license": "MIT",
+    "minimum-stability": "stable",
+    "version": "1.0.0",
+    "authors": [
+        {
+            "name": "lx3gp",
+            "email": "1755773846@qq.com"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/lx3gp/think-auth/issues"
+    },
+    "require": {
+        "php": ">=7.0.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "think\\auth\\": "src/"
+        }
+    },
+    "extra": {
+        "think": {
+            "config": {
+                "auth": "src/config/auth.php"
+            }
+        }
+    },
+    "scripts" : {
+        "post-install-cmd": [
+            "php think auth:install"
+        ]
+    }
+}

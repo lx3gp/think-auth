@@ -29,7 +29,7 @@ class SendConfig extends Command
 
     public function configure()
     {
-        $this->setName('auth:install')
+        $this->setName('auth:config')
              ->setDescription('install auth addons for the framework ,to do list such as send config to config folder, install mysql script into database');
     }
 
@@ -88,7 +88,6 @@ class SendConfig extends Command
                         $_step_status = true;
                     }                    
                 }catch(\Exception $e){
-                    echo $sql;
                     $_step_status = false;
                     return false;
                 }finally{
@@ -101,7 +100,7 @@ class SendConfig extends Command
             }
         }
 		//创建成功
-        return false;
+        return true;
 	}
 	
 	// //	整理SQL语句中的内容

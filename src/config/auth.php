@@ -7,10 +7,11 @@
 return[
     'auth_on'           => 1, // 权限开关
     'auth_type'         => 1, // 认证方式，1为实时认证；2为登录认证。
-    'auth_group'        => 'think_auth_group', // 用户组数据不带前缀表名
-    'auth_group_access' => 'think_auth_group_access', // 用户-用户组关系不带前缀表名
-    'auth_rule'         => 'think_auth_rule', // 权限规则不带前缀表名
-    'auth_user'         => 'think_user', // 用户信息表不带前缀表名,主键自增字段为id
+    'auth_group'        => 'auth_group', // 用户组数据不带前缀表名
+    'auth_group_access' => 'auth_group_access', // 用户-用户组关系不带前缀表名
+    'auth_rule'         => 'auth_rule', // 权限规则不带前缀表名
+    'auth_user'         => 'user', // 用户信息表不带前缀表名,主键自增字段为id
+    'auth_driver'       => 'cache', // 用户信息存贮介质
 ];
 
 return [
@@ -22,17 +23,17 @@ return [
         // 认证方式，1为实时认证；2为登录认证。
         'auth_type'                         =>  1,
         // 用户组数据表名   用户组数据不带前缀表名
-        'auth_group'                        =>  'think_auth_group',
+        'auth_group'                        =>  'auth_group',
         // 用户-用户组关系表
-        'auth_group_access'                 =>  'think_auth_group_access',
+        'auth_group_access'                 =>  'auth_group_access',
         // 权限规则表
-        'auth_rule'                         =>  'think_auth_rule',
+        'auth_rule'                         =>  'auth_rule',
         // 用户信息表
-        'auth_user'                         =>  'think_user',
+        'auth_user'                         =>  'user',
         // 用户表ID字段名
         'auth_user_pk'                      =>  'id',
         // 用户操作日志表
-        'auth_log'                          =>  'think_auth_log',
+        'auth_log'                          =>  'auth_log',
         //  过期时间，注意，如果使用了JWT验证，请务必保证此项设置与jwt.php配置文件中的token_expire值相同
         'expire'                            =>  '7200', 
         //  session/cache 前缀，如果使用了jwt插件，请务必保持一致
@@ -73,15 +74,15 @@ return [
 		// 认证方式，1为实时认证；2为登录认证。
 		'auth_type'                         =>	1,
 		// 用户组数据表名
-		'auth_group'                        =>	'think_auth_group',
+		'auth_group'                        =>	'auth_group',
 		// 用户-用户组关系表
-		'auth_group_access'                 =>	'think_auth_group_access',
+		'auth_group_access'                 =>	'auth_group_access',
 		// 权限规则表
-		'auth_rule'                         =>	'think_auth_rule',
+		'auth_rule'                         =>	'auth_rule',
 		// 用户信息表
-		'auth_user'                         =>	'think_user',
+		'auth_user'                         =>	'user',
 		//	用户扩展信息表	
-		'auth_user_extend'                  =>	'think_user_extend',
+		'auth_user_extend'                  =>	'user_extend',
 		// 用户表ID字段名
 		'auth_user_pk'                      =>	'id',
 		//	登录验证规则别名

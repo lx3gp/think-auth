@@ -7,9 +7,9 @@
         "auth"
     ],
     "homepage": "https://github.com/lx3gp/think-auth",
-    "license": "MIT",
+    "license": "Apache-2.0",
     "minimum-stability": "stable",
-    "version": "1.0.3",
+    "version": "1.0.0",
     "authors": [
         {
             "name": "lx3gp",
@@ -36,7 +36,7 @@
     },
     "scripts" : {
         "post-install-cmd": [
-            "php think auth:install"
+            "php think auth:config"
         ]
     }
 }

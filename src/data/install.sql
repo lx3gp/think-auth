@@ -105,7 +105,3 @@ CREATE TABLE `__PREFIX__user` (
   UNIQUE KEY `username` (`username`) USING BTREE,
   UNIQUE KEY `IDmask` (`IDmask`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT COMMENT='用户表';
-
--- ----------------------------
--- Records of __PREFIX__user
--- ----------------------------

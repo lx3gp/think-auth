@@ -81,6 +81,7 @@ class Auth
         'auth_group_access' => 'auth_group_access', // 用户-用户组关系表
         'auth_rule' => 'auth_rule', // 权限规则表
         'auth_user' => 'auth_user', // 用户信息表
+        'auth_pk' => 'id', // 用户信息表中的主键
     ];
     /**
      * 类架构函数
@@ -115,13 +116,13 @@ class Auth
      * @param string $relation 如果为 'or' 表示满足任一条规则即通过验证;如果为 'and'则表示需满足所有规则才能通过验证
      * return bool               通过验证返回true;失败返回false
      */
-    public function check($name, $uid, $type = 1, $mode = 'url', $relation = 'or')
+    public function check($name, $user_id, $type = 1, $mode = 'url', $relation = 'or')
     {
         if (!$this->config['auth_on']) {
             return true;
         }
         // 获取用户需要验证的所有有效规则列表
-        $authList = $this->getAuthList($uid, $type);
+        $authList = $this->getAuthList($user_id, $type);
         if (is_string($name)) {
             $name = strtolower($name);
             if (strpos($name, ',') !== false) {
@@ -246,14 +247,14 @@ class Auth
      */
     function getUserInfo($uid)
     {
-        static $userinfo = [];
+        static $userInfo = [];
         $user = Db::name($this->config['auth_user']);
         // 获取用户表主键
-        $_pk = is_string($user->getPk()) ? $user->getPk() : 'uid';
-        if (!isset($userinfo[$uid])) {
-            $userinfo[$uid] = $user->where($_pk, $uid)->find();
+        $_pk = is_string($user->getPk()) ? $user->getPk() : $this->config['auth_pk'];
+        if (!isset($userInfo[$uid])) {
+            $userInfo[$uid] = $user->where($_pk, $uid)->find();
         }
-        return $userinfo[$uid];
+        return $userInfo[$uid];
     }
     //根据uid获取角色名称
     //根据uid获取角色名称

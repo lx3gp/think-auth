@@ -3,10 +3,10 @@ The ThinkPHP6 Auth Package
 - 本插件经thinkphp官方推荐认证扩展，请放心使用
 - 开发者基本礼仪，star一下
 ## 安装
-> composer require wenhainan/thinkphp6-auth
+> composer require lx3gp/think-auth
 
 ## 兼容版本
-- thinkphp 5.0/5.1/6.0
+- thinkphp 6.0
 
 ## 配置
 ```
@@ -19,6 +19,7 @@ The ThinkPHP6 Auth Package
     'auth_group_access' => 'think_auth_group_access', // 用户-用户组关系
     'auth_rule'         => 'think_auth_rule', // 权限规则
     'auth_user'         => 'user', // 用户信息表,主键自增字段为id
+    'auth_driver'		=> 'cache', // 权限数据存储的介质
 ],
 ```
 ## 官网 
@@ -28,49 +29,10 @@ http://www.waytomilky.com/
 606645328
 
 ### 导入数据表
-> `think_` 为自定义的数据表前缀
-
-```
-------------------------------
--- think_auth_rule，规则表，
--- id:主键，name：规则唯一标识, title：规则中文名称 status 状态：为1正常，为0禁用，condition：规则表达式，为空表示存在就验证，不为空表示按照条件验证
-------------------------------
- DROP TABLE IF EXISTS `think_auth_rule`;
-CREATE TABLE `think_auth_rule` (  
-    `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,  
-    `name` char(80) NOT NULL DEFAULT '',  
-    `title` char(20) NOT NULL DEFAULT '',  
-    `status` tinyint(1) NOT NULL DEFAULT '1',  
-    `type` tinyint(1) NOT NULL DEFAULT '1',  
-    `condition` char(100) NOT NULL DEFAULT '',  
-    PRIMARY KEY (`id`),  
-    UNIQUE KEY `name` (`name`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
-------------------------------
--- think_auth_group 用户组表， 
--- id：主键， title:用户组中文名称， rules：用户组拥有的规则id， 多个规则","隔开，status 状态：为1正常，为0禁用
-------------------------------
- DROP TABLE IF EXISTS `think_auth_group`;
-CREATE TABLE `think_auth_group` ( 
-    `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT, 
-    `title` char(100) NOT NULL DEFAULT '', 
-    `status` tinyint(1) NOT NULL DEFAULT '1', 
-    `rules` char(80) NOT NULL DEFAULT '', 
-    PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
-------------------------------
--- think_auth_group_access 用户组明细表
--- uid:用户id，group_id：用户组id
-------------------------------
-DROP TABLE IF EXISTS `think_auth_group_access`;
-CREATE TABLE `think_auth_group_access` (  
-    `uid` mediumint(8) unsigned NOT NULL,  
-    `group_id` mediumint(8) unsigned NOT NULL, 
-    UNIQUE KEY `uid_group_id` (`uid`,`group_id`),  
-    KEY `uid` (`uid`), 
-    KEY `group_id` (`group_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-```
+> `__PREFIX__` 为自定义的数据表前缀
+> 请确认已经配置了数据库相关信息
+> 请确认数据库中不存在auth_rule、auth_group、auth_group_access、user这四个数据表
+> 使用composer安装该插件后，系统会自动将上述数据表导入到数据库中，无需手动导入
 
 ## 原理
 Auth权限认证是按规则进行认证。
@@ -90,7 +52,7 @@ Auth权限认证是按规则进行认证。
 判断权限方法
 ```
 // 引入类库
-use think\wenhainan\Auth;
+use think\auth\Auth;
 
 // 获取auth实例
 $auth = Auth::instance();
@@ -108,7 +70,7 @@ Auth类也可以对节点进行认证，我们只要将规则名称，定义为�
 ```
 <?php
 use think\Controller;
-use think\wenhainan\Auth;
+use think\auth\Auth;
 class Base extends Controller
 {
     public function _initialize()
@@ -116,7 +78,7 @@ class Base extends Controller
 		$controller = request()->controller();
 		$action = request()->action();
 		$auth = new Auth();
-		if(!$auth->check($controller . '-' . $action, session('uid'))){
+		if(!$auth->check($controller . '-' . $action, session('id'))){
 			$this->error('你没有权限访问');
 		}
     }

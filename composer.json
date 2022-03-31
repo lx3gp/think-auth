@@ -9,7 +9,7 @@
     "homepage": "https://github.com/lx3gp/think-auth",
     "license": "Apache-2.0",
     "minimum-stability": "stable",
-    "version": "1.0.5",
+    "version": "1.0.7",
     "authors": [
         {
             "name": "lx3gp",
@@ -35,8 +35,15 @@
         }
     },
     "scripts" : {
-        "post-install-cmd": [
-            "php think auth:config"
+        "post-package-install": [
+            "think\\command\\Operation::postPackageInstall"
+        ],
+        "post-package-update": [
+        ],
+        "pre-package-uninstall": [
+            "think\\command\\Operation::prePackageUninstall"
+        ],
+        "post-package-uninstall": [
         ]
     }
 }

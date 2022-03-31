@@ -5,6 +5,12 @@ The ThinkPHP6 Auth Package
 ## 安装
 > composer require lx3gp/think-auth
 
+## 更新
+> composer update lx3gp/think-auth
+
+## 卸载
+> composer remove lx3gp/think-auth
+
 ## 兼容版本
 - thinkphp 6.0
 
@@ -19,15 +25,10 @@ The ThinkPHP6 Auth Package
     'auth_group_access' => 'think_auth_group_access', // 用户-用户组关系
     'auth_rule'         => 'think_auth_rule', // 权限规则
     'auth_user'         => 'user', // 用户信息表,主键自增字段为id
-    'auth_driver'	=> 'cache', // 权限数据存储的介质
+    'auth_driver'		=> 'cache', // 权限数据存储的介质
     'auth_pk'           =>  'id',// 用户表ID字段名
 ],
 ```
-## 官网 
-http://www.waytomilky.com/
-
-# 交流qq群
-606645328
 
 ### 导入数据表
 > - `__PREFIX__` 为自定义的数据表前缀
@@ -122,3 +123,7 @@ Auth类还可以按用户属性进行判断权限， 比如
 > $auth->check('grade2', uid) 判断用户积分是不是在100-200<br/>
 > $auth->check('grade3', uid) 判断用户积分是不是在200-300
 
+## 注意
+卸载插件的事宜
+> - 卸载插件后，系统会删除数据库中`auth_rule`、`auth_group`、`auth_group_access`、`user`这四个数据表
+> - 卸载插件后，会移除./config/auth.php配置文件

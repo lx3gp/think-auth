@@ -19,7 +19,8 @@ The ThinkPHP6 Auth Package
     'auth_group_access' => 'think_auth_group_access', // 用户-用户组关系
     'auth_rule'         => 'think_auth_rule', // 权限规则
     'auth_user'         => 'user', // 用户信息表,主键自增字段为id
-    'auth_driver'		=> 'cache', // 权限数据存储的介质
+    'auth_driver'	=> 'cache', // 权限数据存储的介质
+    'auth_pk'           =>  'id',// 用户表ID字段名
 ],
 ```
 ## 官网 

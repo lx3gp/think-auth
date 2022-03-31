@@ -29,10 +29,10 @@ http://www.waytomilky.com/
 606645328
 
 ### 导入数据表
-> `__PREFIX__` 为自定义的数据表前缀
-> 请确认已经配置了数据库相关信息
-> 请确认数据库中不存在auth_rule、auth_group、auth_group_access、user这四个数据表
-> 使用composer安装该插件后，系统会自动将上述数据表导入到数据库中，无需手动导入
+> - `__PREFIX__` 为自定义的数据表前缀
+> - 请确认已经配置了数据库相关信息
+> - 请确认数据库中不存在`auth_rule`、`auth_group`、`auth_group_access`、`user`这四个数据表
+> - 使用`composer`安装该插件后，系统会自动将上述数据表导入到数据库中，无需手动导入
 
 ## 原理
 Auth权限认证是按规则进行认证。

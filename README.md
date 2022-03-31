@@ -33,6 +33,7 @@ http://www.waytomilky.com/
 > - 请确认已经配置了数据库相关信息
 > - 请确认数据库中不存在`auth_rule`、`auth_group`、`auth_group_access`、`user`这四个数据表
 > - 使用`composer`安装该插件后，系统会自动将上述数据表导入到数据库中，无需手动导入
+> - 如果安装插件后，在数据库中没有发现上述4张表，请将./vendor/lx3gp/data/install.sql文件手动导入至数据库
 
 ## 原理
 Auth权限认证是按规则进行认证。

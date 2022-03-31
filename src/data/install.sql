@@ -21,10 +21,6 @@ CREATE TABLE `__PREFIX__auth_group` (
 ) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
--- Records of __PREFIX__auth_group
--- ----------------------------
-
--- ----------------------------
 -- Table structure for __PREFIX__auth_group_access
 -- ----------------------------
 DROP TABLE IF EXISTS `__PREFIX__auth_group_access`;
@@ -35,10 +31,6 @@ CREATE TABLE `__PREFIX__auth_group_access` (
   KEY `uid` (`uid`) USING BTREE,
   KEY `group_id` (`group_id`) USING BTREE
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
-
--- ----------------------------
--- Records of __PREFIX__auth_group_access
--- ----------------------------
 
 -- ----------------------------
 -- Table structure for __PREFIX__auth_rule
@@ -63,10 +55,6 @@ CREATE TABLE `__PREFIX__auth_rule` (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `name` (`name`) USING BTREE
 ) ENGINE=MyISAM AUTO_INCREMENT=147 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
-
--- ----------------------------
--- Records of __PREFIX__auth_rule
--- ----------------------------
 
 -- ----------------------------
 -- Table structure for __PREFIX__user

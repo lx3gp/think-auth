@@ -1,7 +1,8 @@
 <?php
+declare (strict_types = 1);
 /**
  * +----------------------------------------------------------------------
- * | think-addons [thinkphp6]
+ * | think-auth [thinkphp6]
  * +----------------------------------------------------------------------
  * | FILE: SendConfig.php
  * | AUTHOR: DreamLee
@@ -14,8 +15,7 @@
  * | Copyright (c) 2022 DreamLee All rights reserved.
  * +----------------------------------------------------------------------
  */
-
-namespace think\auth\command;
+namespace think\command;
 
 use think\console\Command;
 use think\console\Input;

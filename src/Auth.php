@@ -1,16 +1,25 @@
 <?php
-// +----------------------------------------------------------------------
-// | ThinkPHP 6 auth
-// +----------------------------------------------------------------------
-// | Copyright (c) 2018 http://www.wyxgn.com All rights reserved.
-// +----------------------------------------------------------------------
-// | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 ;)
-// +----------------------------------------------------------------------
-// | Author: wenhainan <610176732@qq.com>
-// +----------------------------------------------------------------------
-namespace think\auth;
+declare (strict_types = 1);
+/**
+ * +----------------------------------------------------------------------
+ * | think-auth [thinkphp6]
+ * +----------------------------------------------------------------------
+ * | FILE: Auth.php
+ * | AUTHOR: DreamLee
+ * | EMAIL: 1755773846@qq.com
+ * | QQ: 1755773846
+ * | DATETIME: 2022/03/31 14:47
+ * |-----------------------------------------
+ * | 不积跬步,无以至千里；不积小流，无以成江海！
+ * +----------------------------------------------------------------------
+ * | Copyright (c) 2022 DreamLee All rights reserved.
+ * +----------------------------------------------------------------------
+ */
+namespace think;
+
 use think\facade\Db;
 use think\facade\Config;
+use think\facade\Cache;
 use think\facade\Session;
 use think\facade\Request;
 /**
@@ -75,14 +84,20 @@ class Auth
     protected static $instance;
     //默认配置
     protected $config = [
-        'auth_on' => 1, // 权限开关
-        'auth_type' => 1, // 认证方式，1为实时认证；2为登录认证。
-        'auth_group' => 'auth_group', // 用户组数据表名
-        'auth_group_access' => 'auth_group_access', // 用户-用户组关系表
-        'auth_rule' => 'auth_rule', // 权限规则表
-        'auth_user' => 'auth_user', // 用户信息表
-        'auth_pk' => 'id', // 用户信息表中的主键
+		'auth_on'           => 1, // 权限开关
+		'auth_type'         => 1, // 认证方式，1为实时认证；2为登录认证。
+		'auth_group'        => 'auth_group', // 用户组数据不带前缀表名
+		'auth_group_access' => 'auth_group_access', // 用户-用户组关系不带前缀表名
+		'auth_rule'         => 'auth_rule', // 权限规则不带前缀表名
+		'auth_user'         => 'user', // 用户信息表不带前缀表名,主键自增字段为id
+		'auth_driver'       => 'cache', // 用户信息存贮介质
+		'auth_pk'           => 'id',// 用户表ID字段名
     ];
+
+    /**
+     * 默认配置  -   存储驱动
+     */
+    protected $driver = 'cache';
     /**
      * 类架构函数
      * Auth constructor.
@@ -93,6 +108,11 @@ class Auth
         if ($auth = Config::get('auth')) {
             $this->config = array_merge($this->config, $auth);
         }
+
+        if ($this->config['auth_driver']) {
+            $this->driver = $this->config['auth_driver'];
+        }
+
     }
     /**
      * 初始化
@@ -100,13 +120,14 @@ class Auth
      * @param array $options 参数
      * return \think\Request
      */
-    public static function instance($options = [])
+    public static function instance($options = null)
     {
         if (is_null(self::$instance)) {
             self::$instance = new static($options);
         }
         return self::$instance;
     }
+
     /**
      * 检查权限
      * @param $name string|array  需要验证的规则列表,支持逗号分隔的权限规则或索引数组
@@ -116,13 +137,13 @@ class Auth
      * @param string $relation 如果为 'or' 表示满足任一条规则即通过验证;如果为 'and'则表示需满足所有规则才能通过验证
      * return bool               通过验证返回true;失败返回false
      */
-    public function check($name, $user_id, $type = 1, $mode = 'url', $relation = 'or')
+    public function check($name, $uid, $type = 1, $mode = 'url', $relation = 'or')
     {
         if (!$this->config['auth_on']) {
             return true;
         }
         // 获取用户需要验证的所有有效规则列表
-        $authList = $this->getAuthList($user_id, $type);
+        $authList = $this->getAuthList($uid, $type);
         if (is_string($name)) {
             $name = strtolower($name);
             if (strpos($name, ',') !== false) {
@@ -197,9 +218,18 @@ class Auth
         if (isset($_authList[$uid . $t])) {
             return $_authList[$uid . $t];
         }
-        if (2 == $this->config['auth_type'] && Session::has('_auth_list_' . $uid . $t)) {
-            return Session::get('_auth_list_' . $uid . $t);
+
+        //返回cache/session中结果
+        if(strtolower($this->driver) == "cache") {
+            if (2 == $this->config['auth_type'] && Cache::has('_auth_list_' . $uid . $t)) {
+                return Cache::get('_auth_list_' . $uid . $t);   
+            }
+        }else if(strtolower($this->driver) == "session"){
+            if (2 == $this->config['auth_type'] && Session::has('_auth_list_' . $uid . $t)) {
+                return Session::get('_auth_list_' . $uid . $t);  
+            }
         }
+
         //读取用户所属用户组
         $groups = $this->getGroups($uid);
         $ids = []; //保存用户所属用户组设置的所有权限规则id
@@ -237,8 +267,12 @@ class Auth
         }
         $_authList[$uid . $t] = $authList;
         if (2 == $this->config['auth_type']) {
-            //规则列表结果保存到session
-            Session::set('_auth_list_' . $uid . $t, $authList);
+            //规则列表结果保存到cache/session
+            if(strtolower($this->driver) == "cache") {
+                Cache::set('_auth_list_' . $uid . $t, $authList);                
+            }else if(strtolower($this->driver) == "session"){
+                Session::set('_auth_list_' . $uid . $t, $authList);  
+            }
         }
         return array_unique($authList);
     }
@@ -247,14 +281,14 @@ class Auth
      */
     function getUserInfo($uid)
     {
-        static $userInfo = [];
+        static $userinfo = [];
         $user = Db::name($this->config['auth_user']);
         // 获取用户表主键
         $_pk = is_string($user->getPk()) ? $user->getPk() : $this->config['auth_pk'];
-        if (!isset($userInfo[$uid])) {
-            $userInfo[$uid] = $user->where($_pk, $uid)->find();
+        if (!isset($userinfo[$uid])) {
+            $userinfo[$uid] = $user->where($_pk, $uid)->find();
         }
-        return $userInfo[$uid];
+        return $userinfo[$uid];
     }
     //根据uid获取角色名称
     //根据uid获取角色名称
@@ -270,7 +304,7 @@ class Auth
     /**
      * 授予用户权限
      */
-    public   function  setRole($uid,$group_id){
+    public function setRole($uid,$group_id){
         $res =  Db::name('auth_group_access')
             ->where('uid',$uid)
             ->update(['group_id'=>$group_id]);

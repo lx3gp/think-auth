@@ -18,7 +18,6 @@ declare (strict_types = 1);
 namespace think;
 
 use think\facade\Db;
-use think\facade\Config;
 use think\facade\Cache;
 use think\facade\Session;
 use think\facade\Request;
@@ -102,17 +101,27 @@ class Auth
      * 类架构函数
      * Auth constructor.
      */
-    public function __construct()
+    public function __construct($isSeparate=false)
     {
         //可设置配置项 auth, 此配置项为数组。
-        if ($auth = Config::get('auth')) {
-            $this->config = array_merge($this->config, $auth);
+        if($isSeparate){    //  是否多端分离权限配置
+            $module     = app('http')->getName();   //应用名
+            if ( $module=='api' ) {
+                //  获取API配置
+                $config = config('auth.api');
+            }else{
+                //  获取API配置
+                $config = config('auth.other');
+            }
+        }else{  //  单一/统一权限配置
+            $config = config('auth');
         }
-
+        if ($config) {
+            $this->config = array_merge($this->config, $config);
+        }
         if ($this->config['auth_driver']) {
             $this->driver = $this->config['auth_driver'];
         }
-
     }
     /**
      * 初始化

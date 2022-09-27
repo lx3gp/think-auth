@@ -44,20 +44,20 @@ return [
         //  是否需要刷新登陆状态，  如果使用了JWT插件，请启用下列配置项
         'auth_refresh_on'                    =>  1,
         //  【免验证】免验证模块
-        'batch_no_auth_module'               =>  ['api','index'],
+        'batch_no_auth_module'               =>  [],
         //  【免验证】免验证控制器
-        'batch_no_auth_controller'           =>  ['v1.login', 'v1.wxutil', 'v1.wxuser','Utils'],
+        'batch_no_auth_controller'           =>  [],
         //  【免验证】免验证方法
-        'batch_no_auth_action'               =>  ['unionpayNotifyUrl', 'alipayNotifyUrl', 'wxpayNotifyUrl', 'alipayRedirect', 'notify', 'payResult', 'handleFactoryPay', '_updatePaymentOrders', '_rechargeReward', '_changeOrderStatus', '_insertFinanceData'],
+        'batch_no_auth_action'               =>  [],
         //  【免验证】免验证具体方法
         'no_auth_method'                     =>  [],   
         
         //  【免登录】当前网站下，不需要登陆的模块
         'batch_no_login_module'              =>  [],
         //  【免登录】当前网站下，不需要登陆的控制器
-        'batch_no_login_controller'          =>  ['Utils'],
+        'batch_no_login_controller'          =>  [],
         //  【免登录】当前网站下，不需要登陆的方法
-        'batch_no_login_action'              =>  ['unionpayNotifyUrl', 'alipayNotifyUrl', 'wxpayNotifyUrl', 'alipayRedirect', 'notify', 'payResult', 'handleFactoryPay', '_updatePaymentOrders', '_rechargeReward', '_changeOrderStatus', '_insertFinanceData'], 
+        'batch_no_login_action'              =>  [], 
         //  【免登录】当前网站下，不需要登陆的批量方法
         'no_login_method'                    =>  [], 
 

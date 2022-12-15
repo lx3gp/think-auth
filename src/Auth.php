@@ -150,11 +150,17 @@ class Auth
      * @param int $authRelationWay 权限获取是否依赖父级用户组权限，0 表示不依赖父级用户组， 1 表示依赖父级用户组
      * @return bool               通过验证返回true;失败返回false
      */
-    public function check($name, $uid, $type = 1, $mode = 'url', $relation = 'or', $authRelationWay = 0)
+    public function check($name, $uid, $type = null, $mode = 'url', $relation = 'or', $authRelationWay = 0)
     {
         if (!$this->config['auth_on']) {
             return true;
         }
+
+        //  判断是否存在登录类型
+        if (!$type) {
+            $type = $this->config['auth_type'];
+        }
+
         // 获取用户需要验证的所有有效规则列表
         $authList = $this->getAuthList($uid, $type, $authRelationWay);
         if (is_string($name)) {
@@ -202,22 +208,21 @@ class Auth
      *     array('uid'=>'用户id','group_id'=>'用户组id','title'=>'用户组名称','rules'=>'用户组拥有的规则id,多个,号隔开'),
      *     ...)
      */
-    public function getGroups($uid)
+    public function getGroups(int $uid = null)
     {
-        static $groups = [];
-        if (isset($groups[$uid])) {
-            return $groups[$uid];
+        $groups = [];
+        if(!$uid){
+            return $groups;
         }
         // 转换表名
         $auth_group_access = $this->config['auth_group_access'];
         $auth_group = $this->config['auth_group'];
         // 执行查询
-        $user_groups = Db::view($auth_group_access, 'uid,group_id')
+        $groups = Db::view($auth_group_access, 'uid,group_id')
             ->view($auth_group, 'title,rules', "{$auth_group_access}.group_id={$auth_group}.id", 'LEFT')
             ->where("{$auth_group_access}.uid='{$uid}' and {$auth_group}.status='1'")
-            ->select();
-        $groups[$uid] = $user_groups ?: [];
-        return $groups[$uid];
+            ->select()->toArray();
+        return $groups;
     }
 
 
@@ -254,10 +259,11 @@ class Auth
             }
             //  获取当前用户所在的用户组，并将数据加入到其中
             $userGroupInfo = $this->getGroups($uid);
-            $ruleNodes = array_merge($ruleNodes, $this->getMergeArrayField($userGroupInfo[0], 'rules'));
+            $ruleNodes = array_merge($ruleNodes, $this->getMergeArrayField($userGroupInfo, 'rules'));
         }
         return array_unique($ruleNodes);
     }
+
 
     /**
      * 获得权限列表
@@ -420,6 +426,7 @@ class Auth
         return $arr;
 	}
 
+
 	//传递分类ID，返回他父级分类或顶级分类
 	// $type 1为父级，2为顶级
 	function getParent($cate, $id, $type = 1) {
@@ -456,27 +463,121 @@ class Auth
 		return $parent_info;
 	}
 
+
+// 	//传递一个子分类ID返回他的同级分类
+// 	static public function getSameCate($cate, $id) {
+// 		$arr  = array();
+// 		$self = self::getSelf($cate, $id);
+// 		if (empty($self)) {
+// 			return $arr;
+// 		}
+
+// 		foreach ($cate as $v) {
+// 			if ($v['id'] == $self['pid']) {
+// 				$arr[] = $v;
+// 			}
+// 		}
+// 		return $arr;
+// 	}
+
+// 	//判断分类是否有子分类,返回false,true
+// 	static public function hasChild($cate, $id) {
+// 		$arr = false;
+// 		foreach ($cate as $v) {
+// 			if ($v['pid'] == $id) {
+// 				$arr = true;
+// 				return $arr;
+// 			}
+// 		}
+
+// 		return $arr;
+// 	}
+
+// 	//传递一个父级分类ID返回所有子分类ID
+// 	/**
+// 	 *@param $cate 全部分类数组
+// 	 *@param $pid 父级ID
+// 	 *@param $flag 是否包括父级自己的ID，默认不包括
+// 	 **/
+// 	static public function getChildsId($cate, $pid, $flag = 0) {
+// 		$arr = array();
+// 		if ($flag) {
+// 			$arr[] = $pid;
+// 		}
+// 		foreach ($cate as $v) {
+// 			if ($v['pid'] == $pid) {
+// 				$arr[] = $v['id'];
+// 				$arr   = array_merge($arr, self::getChildsId($cate, $v['id']));
+// 			}
+// 		}
+
+// 		return $arr;
+// 	}
+
+// 	//传递一个父级分类ID返回所有子级分类
+// 	static public function getChilds($cate, $pid) {
+// 		$arr = array();
+// 		foreach ($cate as $v) {
+// 			if ($v['pid'] == $pid) {
+// 				$arr[] = $v;
+// 				$arr   = array_merge($arr, self::getChilds($cate, $v['id']));
+// 			}
+// 		}
+// 		return $arr;
+// 	}
+
+// 	//传递一个分类ID返回该分类相当信息
+// 	static public function getSelf($cate, $id) {
+// 		$arr = array();
+// 		foreach ($cate as $v) {
+// 			if ($v['id'] == $id) {
+// 				$arr = $v;
+// 				return $arr;
+// 			}
+// 		}
+// 		return $arr;
+// 	}
+
+// 	//传递一个分类ID返回该分类相当信息
+// 	static public function getSelfByEName($cate, $ename) {
+// 		$arr = array();
+// 		foreach ($cate as $v) {
+// 			if ($v['ename'] == $ename) {
+// 				$arr = $v;
+// 				return $arr;
+// 			}
+// 		}
+// 		return $arr;
+// 	}
+
     /**
      * 对数组中指定的字段进行提取合并
      * @param array $array 需要处理的数组
      * @param string $field 需要提取的字段名称
      * @return array 返回的信息
      */
-    function getMergeArrayField(array $array = null, string $field = null){
-        if(!$array || !$field){
+    protected function getMergeArrayField(array $array = null, string $field = null){
+        if(!(is_array($array) && !empty($array) && !empty($field))){
             return [];
         }
         $rules = [];
         //  判断并提取字段值
-        if(is_array($array) && array_key_exists($field, $array)){   //  单数组
+        if(array_key_exists($field, $array)){   //  单数组
             $rules = explode(',', $array[$field]);
-        } else if(is_array($array) && !array_key_exists($field, $array)) {  //  多维数组
+        } else {  //  多维数组
             $_rules = array_column($array, $field);
             foreach($_rules as $r){
-                $rules = array_merge($rules, explode(',', $r));
+                if(empty($rules)){
+                    $rules = explode(',', $r);
+                }else{
+                    $__rules = explode(',', $r);
+                    foreach($__rules as $__rv){
+                        $rules[] = $__rv;
+                    }
+                }
             }
         }
-        return array_unique($rules);
+        return array_values($rules);
     }
 
     /**
